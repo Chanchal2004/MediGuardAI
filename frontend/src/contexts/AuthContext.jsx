@@ -9,9 +9,25 @@ export function AuthProvider({ children }) {
 
     const refresh = useCallback(async () => {
         try {
-            const res = await api.get("/auth/me");
+            const email = localStorage.getItem("user_email");
+            const name = localStorage.getItem("user_name");
+
+            if (!email) {
+                setUser(null);
+                setLoading(false);
+                return;
+            }
+
+            const res = await api.get("/auth/me", {
+                headers: {
+                    "X-User-Email": email,
+                    "X-User-Name": name || "",
+                },
+            });
+
             setUser(res.data);
-        } catch {
+        } catch (err) {
+            console.error(err);
             setUser(null);
         } finally {
             setLoading(false);
@@ -19,22 +35,33 @@ export function AuthProvider({ children }) {
     }, []);
 
     useEffect(() => {
-        // CRITICAL: If returning from OAuth callback, skip the /me check.
-        // AuthCallback will exchange the session_id and establish the session first.
-        if (typeof window !== "undefined" && window.location.hash?.includes("session_id=")) {
-            setLoading(false);
-            return;
-        }
         refresh();
     }, [refresh]);
 
     const logout = async () => {
-        try { await api.post("/auth/logout"); } catch {}
+        try {
+            await api.post("/auth/logout");
+        } catch (err) {
+            console.error(err);
+        }
+
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("user_name");
+        localStorage.removeItem("user_picture");
+
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, loading, refresh, logout }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                setUser,
+                loading,
+                refresh,
+                logout,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

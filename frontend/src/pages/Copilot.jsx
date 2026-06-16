@@ -30,11 +30,18 @@ export default function Copilot() {
         setStreaming(true);
         try {
             const res = await fetch(`${API_BASE}/copilot/chat`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: content, chat_session_id: sessionId, language }),
-            });
+    method: "POST",
+    credentials: "include",
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("user_email")}`,
+    },
+    body: JSON.stringify({
+        message: content,
+        chat_session_id: sessionId,
+        language,
+    }),
+});
             if (!res.ok || !res.body) throw new Error("stream failed");
             const reader = res.body.getReader();
             const decoder = new TextDecoder();

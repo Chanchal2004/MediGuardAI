@@ -98,6 +98,7 @@ async def current_user(
     session_token: Optional[str] = Cookie(default=None),
     authorization: Optional[str] = Header(default=None),
 ):
+    print("CURRENT_USER AUTH =", authorization)
     return await require_user(db, session_token, authorization)
 
 
