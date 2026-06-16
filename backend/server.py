@@ -1109,7 +1109,7 @@ app.include_router(api)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=os.environ.get("CORS_ORIGINS", "https://medi-guard-ai-8444.vercel.app").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
